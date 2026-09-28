@@ -103,7 +103,7 @@ def show(fig, caption=""):
             legend_on = fig.layout.showlegend is not False and (fig.layout.legend.y is None or fig.layout.legend.y > 0.5)
             is_pie = any(t.type == 'pie' for t in fig.data)
             has_facets = any(getattr(an, 'yref', None) == 'paper' and (an.y or 0) >= 1 for an in fig.layout.annotations)
-            fig.update_layout(title_text=None, margin=dict(t=45 if (legend_on or is_pie or has_facets) else 15))
+            fig.update_layout(title_text="", margin=dict(t=45 if (legend_on or is_pie or has_facets) else 15))
         if _NEW_WIDTH:
             st.plotly_chart(fig, width="stretch")
         else:
@@ -156,7 +156,7 @@ def style(fig, height=380, legend=True):
     fig.update_layout(height=height, margin=dict(l=10, r=10, t=95 if legend else 70, b=10),
                       plot_bgcolor="white", paper_bgcolor="white", font=dict(color=INK, size=12), showlegend=legend,
                       title=dict(x=0.5, xanchor="center", y=0.97, yanchor="top", font=dict(size=19, color=INK)),
-                      legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5, title=None),
+                      legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5, title=dict(text="")),
                       hoverlabel=dict(bgcolor="white", font_size=12))
     fig.update_xaxes(showgrid=False, zeroline=False, showline=True, linecolor=BORDER, ticks="outside",
                      tickcolor=BORDER, tickfont=dict(color="#222222", size=13), title_font=dict(color="#000000", size=16, family="Arial, Helvetica, sans-serif"))
@@ -351,7 +351,7 @@ with tab_d:
                      title=f"{sev_scale.split(' (')[0]} at admission by gender",
                      text=sv['%'].round(0).astype(int).astype(str) + '%')
         fig.update_traces(marker_line_color='white', marker_line_width=2, hovertemplate="Level %{fullData.name}: %{x:.1f}%")
-        fig.update_layout(xaxis_title="% of patients within each gender", yaxis_title=None, legend_title_text="Level")
+        fig.update_layout(xaxis_title="% of patients within each gender", yaxis_title="", legend_title_text="Level")
         show(style(fig, 340), "Each bar is 100% of one gender, split by severity level (light blue = mildest, dark blue = "
                               "most severe). Men have a slightly larger share in the most severe level.")
     with c2:
@@ -363,11 +363,11 @@ with tab_d:
                      color_discrete_map={'Readmission': READM_C, 'Death': DEATH_C}, text=tl['Rate'].round(1).astype(str) + '%',
                      title="6-month outcomes by HF type", hover_data={'Patients': True},
                      category_orders={'heart_failure_type': ['Left', 'Right', 'Both']})
-        fig.update_yaxes(matches=None, title=None)
+        fig.update_yaxes(matches=None, title_text="")
         fig.update_yaxes(title_text='% of patients', row=1, col=1)
         fig.update_traces(textposition='outside')
         fig.for_each_annotation(lambda a: a.update(text=a.text.split('=')[-1], font=dict(size=15, color='#000000')))
-        fig.update_layout(xaxis_title=None, xaxis2_title=None)
+        fig.update_layout(xaxis_title="", xaxis2_title="")
         show(style(fig, 340, legend=False), "6-month readmission (blue, left) and death (red, right) for left-sided, "
                                             "right-sided and biventricular (Both) heart failure. Biventricular failure has the "
                                             "highest rates; right-sided has only 51 patients.")
@@ -404,7 +404,7 @@ with tab_d:
         fig = px.bar(x=dr.values, y=dr.index, orientation='h', title="Most-used medicines",
                      text=[f"{v:.0f}%" for v in dr.values])
         fig.update_traces(marker_color=VIOLET, textposition='outside', hovertemplate="%{y}: %{x:.1f}% of patients")
-        fig.update_layout(xaxis_title="% of patients", yaxis_title=None, xaxis_range=[0, 110])
+        fig.update_layout(xaxis_title="% of patients", yaxis_title="", xaxis_range=[0, 110])
         show(style(fig, 440, legend=False), "The 12 medicines given to the most patients during the stay. Diuretics "
                                             "(spironolactone, furosemide) dominate, followed by digitalis and inotropes.")
     with c2:
@@ -416,7 +416,7 @@ with tab_d:
         fig = px.bar(x=cp.values, y=cp.index, orientation='h', title="Comorbidity prevalence",
                      text=[f"{v:.1f}%" for v in cp.values])
         fig.update_traces(marker_color=AQUA, textposition='outside', hovertemplate="%{y}: %{x:.1f}%")
-        fig.update_layout(xaxis_title="% of patients", yaxis_title=None, xaxis_range=[0, cp.max() * 1.25])
+        fig.update_layout(xaxis_title="% of patients", yaxis_title="", xaxis_range=[0, cp.max() * 1.25])
         show(style(fig, 440, legend=False), "Share of patients with each long-term condition. Chronic kidney disease and "
                                             "diabetes are the most common, each affecting about 1 in 4 patients.")
     insight("Care focuses on decongestion (spironolactone, furosemide) and rate control/inotropy (digoxin, deslanoside, milrinone). "
@@ -530,7 +530,7 @@ with tab_p:
             fig = px.bar(cr, x='group', y=cr['Death'] * 100, text=(cr['Death'] * 100).round(1).astype(str) + '%',
                          title="Cardio-renal risk (biventricular HF)", hover_data={'n': True})
             fig.update_traces(marker_color=[READM_RAMP[1], READM_RAMP[2], READM_RAMP[3], RED][:len(cr)], textposition='outside')
-            fig.update_layout(xaxis_title=None, yaxis_title="% died within 6 months")
+            fig.update_layout(xaxis_title="", yaxis_title="% died within 6 months")
             show(style(fig, 360, legend=False), "6-month mortality in biventricular heart failure, grouped by severe HF (cardiac) "
                                                 "and abnormal kidney function (renal). The red bar marks patients with both "
                                                 "problems, who die far more often.")
@@ -597,7 +597,7 @@ with tab_p:
                      title="Comorbidity risk ratios")
         fig.add_vline(x=1, line_dash='dash', line_color=INK2)
         fig.update_traces(hovertemplate="%{y}: %{x:.2f}× higher<extra></extra>")
-        fig.update_layout(yaxis_title=None, xaxis_title="Times higher than patients without the condition")
+        fig.update_layout(yaxis_title="", xaxis_title="Times higher than patients without the condition")
         show(style(fig, 460), "How many times more likely 6-month death (red) and readmission (blue) are for patients with "
                               "each condition than for those without it; the dashed line at 1 means no difference. Liver disease, "
                               "type 2 respiratory failure and CKD raise death the most.")
@@ -615,7 +615,7 @@ with tab_p:
         fig = px.bar(el, x='echo_recorded', y='Rate', color='Outcome', barmode='group', text=el['Rate'].round(1).astype(str) + '%',
                      color_discrete_map={'Readmission': READM_C, 'Death': DEATH_C}, title="The echo gap")
         fig.update_traces(textposition='outside')
-        fig.update_layout(xaxis_title=None, yaxis_title="% of patients (6 months)")
+        fig.update_layout(xaxis_title="", yaxis_title="% of patients (6 months)")
         show(style(fig, 360), "6-month readmission (blue) and death (red) for patients with and without an echocardiogram "
                               "recorded. Patients with no echo are readmitted far more often.")
     with c2:
@@ -629,7 +629,7 @@ with tab_p:
                      text=dl['Rate'].round(1).astype(str) + '%', title="Leaving against medical advice",
                      color_discrete_map={'Regular discharge': GOOD_C, 'Left against advice': DAMA_C})
         fig.update_traces(textposition='outside')
-        fig.update_layout(xaxis_title=None, yaxis_title="% of patients")
+        fig.update_layout(xaxis_title="", yaxis_title="% of patients")
         show(style(fig, 360), "Patients who left against medical advice (orange) compared with regular discharges (aqua). "
                               "They were twice as often severely ill and had a far higher 28-day death rate.")
     action("Make a completed echo a mandatory pre-discharge item. When a patient asks to leave, hold a senior-doctor conversation, "
@@ -735,7 +735,7 @@ with tab_m:
         for x, lab in [(0.7, 'acceptable'), (0.8, 'good'), (0.9, 'excellent')]:
             fig.add_vline(x=x, line_dash='dot', line_color=INK2, annotation_text=lab, annotation_position='top')
         fig.update_layout(title="Model leaderboard (ROC-AUC)",
-                          xaxis_range=[0.5, 1.0], xaxis_title="Cross-validated ROC-AUC", yaxis_title=None)
+                          xaxis_range=[0.5, 1.0], xaxis_title="Cross-validated ROC-AUC", yaxis_title="")
         show(style(fig, 470, legend=False), "Cross-validated ROC-AUC of every model (0.5 = chance, 1 = perfect). Red = mortality "
                                             "models, blue = phenotype/treatment models, grey = readmission models, which "
                                             "stay below the 0.7 'acceptable' line.")
@@ -811,7 +811,7 @@ with tab_m:
         colr = [BLUE if kind == 'rf' else (RED if v > 0 else AQUA) for v in top_imp.values]
         fig = go.Figure(go.Bar(x=top_imp.values, y=top_imp.index, orientation='h', marker_color=colr,
                                hovertemplate="%{y}: %{x:.3f}<extra></extra>"))
-        fig.update_layout(title="Top predictors", xaxis_title=lab, yaxis_title=None)
+        fig.update_layout(title="Top predictors", xaxis_title=lab, yaxis_title="")
         show(style(fig, 380, legend=False), "The 12 features the model relies on most. For Random Forest, a longer bar = more "
                                             "useful; for Logistic Regression, red bars raise risk and aqua bars lower it.")
 
